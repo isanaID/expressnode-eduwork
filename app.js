@@ -1,7 +1,7 @@
 const express = require('express');
 const path = require('path');
 const app = express();
-const router = require('./routes');
+const router = require('./routes/');
 const log = require('./middlewares/logger');
 const port = 3000;
 

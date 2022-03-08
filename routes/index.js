@@ -15,23 +15,32 @@ router.get('/', (req, res) => {
 });
 
 router.get('/product/:id', (req, res) => {
-    const {id} = req.params;
     res.send({
-        status: 'success',
-        message: 'Product details',
-        id
+        id: req.params.id,
     });
 });
 
-router.post('/product', upload.single('image'), (req, res) => {
+router.post('/product/', upload.single('image'), (req, res) => {
     const {name, price, stock} = req.body;
     const image = req.file;
-    if(image){
-        const target = path.join(__dirname, 'uploads', image.originalname);
-        fs.renameSync(image.path, target, err => {
-            if(err) throw err;
+    fs.rename(image.path, path.join(__dirname, '../uploads', image.originalname), (err) => {
+        if (err) {
+            return res.send({
+                status: 'failed',
+                message: 'Failed to upload image'
+            });
+        }
+        res.send({
+            status: 'success',
+            message: 'Successfully uploaded image',
+            data: {
+                name,
+                price,
+                stock,
+                image: image.originalname
+            }
         });
-    }
+    });
 });
 
 module.exports = router;
