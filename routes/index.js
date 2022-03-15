@@ -1,8 +1,7 @@
 const router = require('express').Router();
+const db = require('../config/database/mysql');
 const multer = require('multer');
-const path = require('path');
-const fs = require('fs');
-const upload = multer({dest: 'uploads'});
+const controller = require('../controller/index');
 
 router.get('/', (req, res) => {
     const {page, total} = req.query;
@@ -14,33 +13,20 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/product/:id', (req, res) => {
-    res.send({
-        id: req.params.id,
-    });
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './uploads');
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.originalname);
+    }
 });
+const upload = multer({storage: storage});
 
-router.post('/product/', upload.single('image'), (req, res) => {
-    const {name, price, stock} = req.body;
-    const image = req.file;
-    fs.rename(image.path, path.join(__dirname, '../uploads', image.originalname), (err) => {
-        if (err) {
-            return res.send({
-                status: 'failed',
-                message: 'Failed to upload image'
-            });
-        }
-        res.send({
-            status: 'success',
-            message: 'Successfully uploaded image',
-            data: {
-                name,
-                price,
-                stock,
-                image: image.originalname
-            }
-        });
-    });
-});
+router.get('/product', controller.product.getAll);
+router.get('/product/:id', controller.product.getOne);
+router.post('/product/', upload.single('image'), controller.product.post);
+router.put('/product/:id', upload.single('image'), controller.product.put);
+router.delete('/product/:id', controller.product.delete);
 
 module.exports = router;
