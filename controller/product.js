@@ -42,7 +42,7 @@ controller.post = async function(req, res) {
             name: req.body.name,
             price: req.body.price,
             stock: req.body.stock,
-            image: req.file.path
+            image: `public/${req.file.filename}`
         });
         res.send({
             status: 'success',
@@ -63,7 +63,7 @@ controller.put = async function(req, res) {
             name: req.body.name,
             price: req.body.price,
             stock: req.body.stock,
-            image: req.file.path
+            image: `public/${req.file.filename}`
         }, {
             where: {
                 id: req.params.id
